@@ -10,7 +10,7 @@ pipeline{
     stages {
         stage('Checkout from Git'){
             steps{
-                git branch: 'master', url: 'https://github.com/vijay3639/Chat-gpt.git'
+                git branch: 'master', url: 'https://github.com/manojinfant77/Ai_Project.git'
             }
         }
         stage('Install Dependencies') {
@@ -33,15 +33,7 @@ pipeline{
                 }
             }
         }
-        stage('OWASP FS SCAN') {
-            environment {
-                NVD_API_KEY = credentials('NVD_API_KEY')
-            }
-            steps {
-                dependencyCheck additionalArguments: "--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey=${NVD_API_KEY}", odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
+        
         stage('TRIVY FS SCAN') {
             steps {
                 sh "trivy fs . > trivyfs.json"
@@ -52,15 +44,15 @@ pipeline{
                 script{
                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
                        sh "docker build -t chatbot ."
-                       sh "docker tag chatbot vijay3639/chatbot:latest "
-                       sh "docker push vijay3639/chatbot:latest "
+                       sh "docker tag chatbot manojinfant77/chatbot:latest "
+                       sh "docker push manojinfant77/chatbot:latest "
                     }
                 }
             }
         }
         stage("TRIVY"){
             steps{
-                sh "trivy image vijay3639/chatbot:latest > trivy.json"
+                sh "trivy image manojinfant77/chatbot:latest > trivy.json"
             }
         }
         stage ("Remove container") {
@@ -71,7 +63,7 @@ pipeline{
         }
         stage('Deploy to container'){
             steps{
-                sh 'docker run -d --name chatbot -p 3000:3000 vijay3639/chatbot:latest'
+                sh 'docker run -d --name chatbot -p 4000:3000 manojinfant77/chatbot:latest'
             }
         }
     }
